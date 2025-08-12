@@ -59,22 +59,26 @@ class Pipeline:
 
                 results.append(
                     {
-                        "service_url": service_url,
+                        "layer_id": layer_id,
                         "layer_name": layer_name,
-                        "layer_url": layer_url,
                         "min_date": stats["min_date"],
                         "max_date": stats["max_date"],
+                        "service_url": service_url,
                     }
                 )
 
         return results
 
-    def generate_dataset(self, layer_info: Dict, output_dir: str = "output"):
-        os.makedirs(output_dir, exist_ok=True)
-
+    def generate_dataset(self, layer_info: Dict):
+        """
+        Get layer data from ArcGIS API and create data outputs for HDX
+        Return dataset
+        """
+        layer_id = layer_info["layer_id"]
         layer_name = layer_info["layer_name"]
         slug = slugify(layer_name)
-        layer_url = layer_info["layer_url"]
+        service_url = layer_info["service_url"]
+        layer_url = f"{service_url}/{layer_id}"
 
         query = {
             "f": "json",
@@ -85,17 +89,8 @@ class Pipeline:
         query_url = f"{layer_url}/query?{urlencode(query)}"
         gdf = read_file("ESRIJSON:" + query_url)
 
-        # Create GeoJSON
-        gdf.to_file(os.path.join(output_dir, f"{slug}.geojson"), driver="GeoJSON")
-
-        # Flatten and drop unnecessary columns
-        gdf["lon"] = gdf.geometry.x
-        gdf["lat"] = gdf.geometry.y
-        gdf.drop(columns=["geometry", "ObjectID_1"]).fillna("")
-
         # Dataset info
         dataset = Dataset({"name": slug, "title": f"Philippines: {layer_name}"})
-
         dataset.set_time_period(layer_info["min_date"], layer_info["max_date"])
         dataset.add_tags(self._configuration["tags"])
         dataset_country_iso3 = "PHL"
@@ -106,11 +101,20 @@ class Pipeline:
             logger.error(f"Couldn't find country {dataset_country_iso3}, skipping")
             return
 
+        # Create GeoJSON
+        output_dir = "output"
+        os.makedirs(output_dir, exist_ok=True)
+        gdf.to_file(os.path.join(output_dir, f"{slug}.geojson"), driver="GeoJSON")
+
+        # Flatten geometry and drop unnecessary columns for csv
+        gdf["lon"] = gdf.geometry.x
+        gdf["lat"] = gdf.geometry.y
+        gdf.drop(columns=["geometry", "ObjectID_1"]).fillna("")
+
         # Add csv resource
         layer_data = gdf.to_dict(orient="records")
         resource_description = f"CSV format of the summary of {layer_name}"
         resource_data = {"name": f"{slug}.csv", "description": resource_description}
-
         dataset.generate_resource_from_iterable(
             headers=list(layer_data[0].keys()),
             iterable=layer_data,
@@ -137,7 +141,7 @@ class Pipeline:
         geoservice_resource = {
             "name": layer_name,
             "description": f"ArcGIS Map Service of the summary of {layer_name}",
-            "url": layer_info["service_url"],
+            "url": service_url,
             "format": "GeoService",
         }
         dataset.add_update_resource(geoservice_resource)
@@ -146,9 +150,9 @@ class Pipeline:
 
     def get_date_range(self, layer_url: str) -> Dict:
         """
-        Get min & max dates using outStatistics from ArcGIS server
+        Get min & max dates using outStatistics from ArcGIS API
         """
-        date_field = "Date_of_Assistance_Deployment"
+        date_field = "Date_of_Assistance_Deployment"  # date column from API
         stats = [
             {
                 "statisticType": "min",

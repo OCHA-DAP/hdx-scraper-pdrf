@@ -170,6 +170,9 @@ cython_debug/
 # Directory where the scraper caches data
 saved_data/
 
+# Directory where scraper outputs files
+output/
+
 # Version file
 **/_version.py
 
