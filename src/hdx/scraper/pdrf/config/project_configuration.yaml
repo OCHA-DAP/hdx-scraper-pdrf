@@ -1,0 +1,8 @@
+# Collector specific configuration
+base_url: "https://handa.pdrf.org.ph/arcgis/rest/services"
+folder: "2024_PS_Response_Efforts"
+
+tags:
+  - cyclones-hurricanes-typhoons
+  - disaster risk reduction-drr
+  - geodata

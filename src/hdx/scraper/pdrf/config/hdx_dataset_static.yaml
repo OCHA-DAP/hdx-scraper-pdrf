@@ -1,0 +1,10 @@
+license_id: cc-by
+methodology: Registry
+caveats:
+dataset_source: Philippine Disaster Resilience Foundation
+package_creator: HDX Data Systems Team
+private: False
+maintainer: fdbb8e79-f020-4039-ab3a-9adb482273b8 # erikawei
+owner_org: c9acf432-a02a-4342-ba62-d22acca0af97 # philippine-disaster-resilience-foundation
+data_update_frequency: -1
+notes: Private Sector's Involvement ("Who is doing What Where")
