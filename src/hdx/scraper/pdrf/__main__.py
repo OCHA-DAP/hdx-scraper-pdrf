@@ -60,7 +60,6 @@ def main(
             # Steps to generate dataset
             #
             layers = pipeline.get_layers()
-
             for layer in layers:
                 dataset = pipeline.generate_dataset(layer)
                 if dataset:
