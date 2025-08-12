@@ -102,7 +102,7 @@ class Pipeline:
             return
 
         # Create GeoJSON
-        output_dir = "output"
+        output_dir = self._tempdir
         os.makedirs(output_dir, exist_ok=True)
         gdf.to_file(os.path.join(output_dir, f"{slug}.geojson"), driver="GeoJSON")
 
