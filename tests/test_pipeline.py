@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from os.path import join
 
+from hdx.utilities.compare import assert_files_same
 from hdx.utilities.downloader import Download
 from hdx.utilities.path import temp_dir
 from hdx.utilities.retriever import Retrieve
@@ -95,3 +96,10 @@ class TestPipeline:
                         "url_type": "api",
                     },
                 ]
+                for resource in resources:
+                    if resource["url_type"] != "upload":
+                        continue
+                    filename = resource["name"]
+                    actual = join(tempdir, filename)
+                    expected = join(input_dir, filename)
+                    assert_files_same(actual, expected)

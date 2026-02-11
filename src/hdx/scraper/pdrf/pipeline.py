@@ -115,14 +115,11 @@ class Pipeline:
         layer_data = gdf.to_dict(orient="records")
         resource_description = f"CSV format of the summary of {layer_name}"
         resource_data = {"name": f"{slug}.csv", "description": resource_description}
-        dataset.generate_resource_from_iterable(
-            headers=list(layer_data[0].keys()),
-            iterable=layer_data,
-            hxltags={},
+        dataset.generate_resource(
             folder=self._tempdir,
             filename=f"{slug}.csv",
+            rows=layer_data,
             resourcedata=resource_data,
-            quickcharts=None,
         )
 
         # Add geojson resource
