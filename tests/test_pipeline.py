@@ -77,27 +77,21 @@ class TestPipeline:
                         "description": "CSV format of the summary of TC_CARINA_PS_Response",
                         "format": "csv",
                         "name": "tc-carina-ps-response.csv",
-                        "resource_type": "file.upload",
-                        "url_type": "upload",
                     },
                     {
                         "description": "Geojson format of the summary of TC_CARINA_PS_Response",
-                        "format": "geojson",
+                        "format": "GeoJSON",
                         "name": "tc-carina-ps-response.geojson",
-                        "resource_type": "file.upload",
-                        "url_type": "upload",
                     },
                     {
                         "description": "ArcGIS Map Service of the summary of TC_CARINA_PS_Response",
-                        "format": "geoservice",
+                        "format": "GeoService",
                         "name": "TC_CARINA_PS_Response",
-                        "resource_type": "api",
                         "url": "https://handa.pdrf.org.ph/arcgis/rest/services/2024_PS_Response_Efforts/TC_2024_000127_PHL_PDRF_PSResponse/MapServer",
-                        "url_type": "api",
                     },
                 ]
                 for resource in resources:
-                    if resource["url_type"] != "upload":
+                    if resource["format"] == "GeoService":
                         continue
                     filename = resource["name"]
                     actual = join(tempdir, filename)
